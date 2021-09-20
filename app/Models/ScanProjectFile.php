@@ -83,40 +83,16 @@ class ScanProjectFile extends Model
             $tela = '';
             $line = $this->find($id);
             $file_name_in = $line['spf_folder_logical'].'/'.$line['spf_folder_nome'];
-            $file_name_in_original = $line['spf_folder_logical'].'/original/'.$line['spf_folder_nome'];
             $file_inf = pathinfo($file_name_in);
-            $file_name_new = $file_inf['filename'].'.jpg';
-            $file_name_out = $line['spf_folder_logical'].'/'.$file_name_new;
+            $file_name_out = $file_inf['filename'].'.jpg';
+            $file_name_out = $line['spf_folder_logical'].'/destinity/'.$file_name_out;
 
-            if ($file_inf['extension'] == 'tiff') 
+            if (($file_inf['extension'] == 'tiff') and (!file_exists($file_name_out)))
                 {
+                dircheck($line['spf_folder_logical'].'/destinity');
                 $cmd = $this->convert.' '.$file_name_in.' ' .$file_name_out;
-                $tela = shell_exec($cmd);           
-                if (!file_exists($file_name_out))
-                    {
-                        $tela .= 'STATUS: <span style="color: red">'.'ERRO'.'</span>';
-                    } else {
-                        $original = $line['spf_folder_logical'].'/original';
-                        dircheck($original);
-                        $file_new = $line['spf_folder_nome'].'.jpg';
-                        /* Copia original para pasta de backup */
-                        copy($file_name_in,$file_name_in_original);
-                        /* Apaga o original e existe a copia */
-                        if (file_exists($file_name_in_original))
-                            {
-                                unlink($file_name_in);
-                            } else {
-                                $tela .= bsmessage('Erro ao exclir arquivo '.$file_name_in,3); 
-                            }
-                        /****************************************** Atualiza Banco de Dados */
-                        $sql = "update ".$this->table." set 
-                                    spf_folder_nome = '".$file_name_new."',
-                                    spf_status = 1
-                                    where id_spf = ".$line['id_spf'];
-                        $this->query($sql);
-                    }
+                $tela = shell_exec($cmd);
                 }
-            //$tela .= $this->thumbnail_create($id);
             return $tela;
         }
 
@@ -169,6 +145,17 @@ class ScanProjectFile extends Model
             }
            return $tela;
         }   
+
+    function viewImages($id)
+        {
+            $dt = $this->find($id);
+            echo '<pre>';
+            print_r($dt);
+            echo '</pre>';
+            $tela = 'ok';
+            return $tela;            
+        }
+
     function viewid($id)
         {
             /**************************************** ACOES */
@@ -199,7 +186,8 @@ class ScanProjectFile extends Model
             $act = $msg;
             if ($ext != 'jpg')
             {
-                $act .= bsc('<a href="'.base_url(PATH.'project/file/'.$id.'?act=tiff_jpg').'" class="btn btn-outline-primary">'.lang('cedap.file_to_jpg').'</a>',1);
+                $act .= bsc('<a href="'.base_url(PATH.'project/file/'.$id.'?act=tiff_jpg').'" class="btn btn-outline-primary">'.lang('cedap.file_to_jpg').'</a>',2);
+                $act .= bsc('<a href="'.base_url(PATH.'project/file/'.$id.'?act=thumbnail_create').'" class="btn btn-outline-primary">'.lang('cedap.thumbnail_create').'</a>',2);
             }
             $tela .= bs($act);
             return bs($tela);
@@ -211,6 +199,10 @@ class ScanProjectFile extends Model
                 {
                     case 'tiff_jpg':
                         $tela = $this->convert_to_jpg($id);
+                        $tela = $this->thumbnail_create($id);
+                        break;
+                    case 'thumbnail_create':
+                        $tela = $this->thumbnail_create($id);
                         break;
                     default:
                     $tela = bsmessage('OPS - '.$act,3);

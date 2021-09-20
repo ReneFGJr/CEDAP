@@ -64,6 +64,7 @@ class ScanProject extends Model
 
                     case 'file':
                         $tela = $ScanProjectFile->viewid($d2);
+                        $tela .= $ScanProjectFile->viewImages($d2);
                         break;
 
                     case 'edit':

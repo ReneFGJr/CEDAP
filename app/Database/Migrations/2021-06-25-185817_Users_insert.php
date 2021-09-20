@@ -4,13 +4,13 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class Users extends Migration
+class Users2 extends Migration
 {
 	public function up()
 	{
         $data = [
                 'us_nome' => 'admin',
-                'us_email' => '',
+                'us_email' => 'admin',
                 'us_image' => '',
                 'us_genero' => '',
                 'us_verificado' => '1',
