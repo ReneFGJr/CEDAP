@@ -105,11 +105,19 @@ class ScanProjectFile extends Model
         }
     function is_destinity($dt)
         {
-            $mini = $dt['spf_folder_logical'].'/destinity/';
-            $mini .= $dt['spf_folder_nome'];
-            $mini = troca($mini,'.tiff','.jpg');
+            $mini = $dt['spf_folder_logical']. '/'. $dt['spf_folder_nome'];
             if (!file_exists($mini))
-                { return false; }
+                { 
+                    $file_inf = pathinfo($mini);
+                    $file = $file_inf['dirname'].'/'.'destinity/'.$file_inf['filename'].'.jpg';
+                    echo $file.'<br>';
+                    if (!file_exists($file))
+                        {
+                            return false;
+                        } else {
+                            return true;
+                        }
+                }
             return true;
         }        
     function image($id,$tp=0)
@@ -170,7 +178,6 @@ class ScanProjectFile extends Model
            $cmd = getenv('CONVERT').' -define jpeg:size=200x200 '.$file_name_in.' -thumbnail 200 '.$file_name_out;
            $tela .= 'CMD: '.$cmd.'<br>';
            $tela = shell_exec($cmd);      
-
            
            if (!file_exists($file_name_out))
             {
