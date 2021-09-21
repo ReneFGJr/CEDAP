@@ -314,10 +314,10 @@ class Cedap extends BaseController
         return $tela;
 	}    
 
-    public function image($id)
+    public function image($id,$id2='',$id3='')
         {
             $ScanProjectFile = new \App\Models\ScanProjectFile();
-            $ScanProjectFile->image($id);
+            $ScanProjectFile->image($id,$id2,$id3);
         }
 
 }

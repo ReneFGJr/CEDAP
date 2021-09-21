@@ -96,25 +96,62 @@ class ScanProjectFile extends Model
             return $tela;
         }
 
-    function image($id,$tp=0)
+    function is_thumbnail($dt)
         {
-            $dt = $this->find($id);
             $mini = $dt['spf_folder_logical'].'/thumbnail/';
             $mini .= $dt['spf_folder_nome'];
+            $mini .= '.jpg';
             if (!file_exists($mini))
+                { return false; }
+            return true;
+        }
+    function is_destinity($dt)
+        {
+            $mini = $dt['spf_folder_logical'].'/destinity/';
+            $mini .= $dt['spf_folder_nome'];
+            $mini = troca($mini,'.tiff','.jpg');
+            if (!file_exists($mini))
+                { return false; }
+            return true;
+        }        
+    function image($id,$tp=0)
+        {
+            $dt = $this->find($id);            
+            switch($tp)
                 {
-                    $mini = 'img/no_image/thumbnail.jpg';
+                    case '1':
+                        $file = $dt['spf_folder_logical'].'/';
+                        $file .= $dt['spf_folder_nome'];
+                        
+                        if (is_file($file))
+                            {
+                                $file_inf = pathinfo($file);
+                                $file = $file_inf['dirname'].'/'.'destinity/'.$file_inf['filename'].'.jpg';
+                            }
+                        break;
+                    default:
+                        $file = $dt['spf_folder_logical'].'/thumbnail/';
+                        $file .= $dt['spf_folder_nome'];
+                        $file .= '.jpg';
+                        break;
+
+                }
+
+            if (!file_exists($file))
+                {
+                    $file = 'img/no_image/thumbnail.jpg';
                 }
             header("Content-Type: image/jpeg");
-            header("Content-Length: " . filesize($mini));
-            readfile($mini);
+            header("Content-Length: " . filesize($file));
+            readfile($file);
             exit;
         }
     function thumbnail($dt)
         {
             $tela = 'ni';
             $mini = $dt['spf_folder_logical'].'/thumbnail/';
-            $mini .= $dt['spf_folder_nome'];
+            $name = trim($dt['spf_folder_nome']);
+            $name = troca($name,'.tiff','.jpg');
             if (file_exists($mini))
                 {
                     $tela = base_url(PATH.'image/'.$dt['id_spf'].'/0/mini.jpg');
@@ -149,10 +186,23 @@ class ScanProjectFile extends Model
     function viewImages($id)
         {
             $dt = $this->find($id);
-            echo '<pre>';
-            print_r($dt);
-            echo '</pre>';
-            $tela = 'ok';
+
+            /*******************************************************************************/
+            if ($this->is_destinity($dt))
+                {
+                    $file_name_in = $dt['spf_folder_logical'].'/'.$dt['spf_folder_nome'];
+                    $file_inf = pathinfo($file_name_in);
+                    $name = $file_inf['dirname'].'/destinity/'.$file_inf['filename'].'.jpg';
+                    $tela = '<h1>'.$name.'</h1>';
+                    if (file_exists($name))
+                        {
+                            $url = base_url(PATH.'image/'.$dt['id_spf'].'/1/mini.jpg');
+                            $tela .= '<img src="'.$url.'" class="img-fluid">';
+                        }
+                    
+                } else {
+                    $tela = '';
+                }            
             return $tela;            
         }
 
@@ -184,10 +234,13 @@ class ScanProjectFile extends Model
 
             /***************************************************** ACtions *****************/
             $act = $msg;
-            if ($ext != 'jpg')
+            if (!$this->is_destinity($dt))
             {
-                $act .= bsc('<a href="'.base_url(PATH.'project/file/'.$id.'?act=tiff_jpg').'" class="btn btn-outline-primary">'.lang('cedap.file_to_jpg').'</a>',2);
-                $act .= bsc('<a href="'.base_url(PATH.'project/file/'.$id.'?act=thumbnail_create').'" class="btn btn-outline-primary">'.lang('cedap.thumbnail_create').'</a>',2);
+                $act .= bsc('<a href="'.base_url(PATH.'project/file/'.$id.'?act=tiff_jpg').'" class="btn btn-outline-primary">'.lang('cedap.file_to_jpg').'</a>',2);                
+            }
+            if (!$this->is_thumbnail($dt))
+            {
+                $act .= bsc('<a href="'.base_url(PATH.'project/file/'.$id.'?act=thumbnail_create').'" class="btn btn-outline-primary">'.lang('cedap.thumbnail_create').'</a>',2);            
             }
             $tela .= bs($act);
             return bs($tela);
