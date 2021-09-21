@@ -8,7 +8,6 @@ use App\Controllers\BaseController;
 $this->session = \Config\Services::session();
 $language = \Config\Services::language();
 
-
 helper(['boostrap','url','graphs','sisdoc_forms','form']);
 
 function cr()

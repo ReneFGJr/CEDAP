@@ -47,9 +47,7 @@ class ScanProjectFile extends Model
     protected $beforeFind           = [];
     protected $afterFind            = [];
     protected $beforeDelete         = [];
-    protected $afterDelete          = [];
-
-    var $convert = 'd:/Projeto/ImageMagick/magick';
+    protected $afterDelete          = [];    
 
     function workspace($idf)
         {
@@ -90,7 +88,7 @@ class ScanProjectFile extends Model
             if (($file_inf['extension'] == 'tiff') and (!file_exists($file_name_out)))
                 {
                 dircheck($line['spf_folder_logical'].'/destinity');
-                $cmd = $this->convert.' '.$file_name_in.' ' .$file_name_out;
+                $cmd = getenv('CONVERT').' '.$file_name_in.' ' .$file_name_out;
                 $tela = shell_exec($cmd);
                 }
             return $tela;
@@ -166,11 +164,10 @@ class ScanProjectFile extends Model
            $line = $this->find($id);
            $tela = '';
            $thumbnail = $line['spf_folder_logical'].'/thumbnail';
-           dircheck($thumbnail);
-
+           dircheck($thumbnail);            
            $file_name_in = $line['spf_folder_logical'].'/'.$line['spf_folder_nome'];
            $file_name_out = $thumbnail.'/'.$line['spf_folder_nome'].'.jpg';
-           $cmd = $this->convert.' -define jpeg:size=200x200 '.$file_name_in.' -thumbnail 200 '.$file_name_out;
+           $cmd = getenv('CONVERT').' -define jpeg:size=200x200 '.$file_name_in.' -thumbnail 200 '.$file_name_out;
            $tela .= 'CMD: '.$cmd.'<br>';
            $tela = shell_exec($cmd);      
 
