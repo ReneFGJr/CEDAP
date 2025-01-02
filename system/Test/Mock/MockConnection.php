@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of CodeIgniter 4 framework.
  *
@@ -16,14 +18,31 @@ use CodeIgniter\Database\BaseConnection;
 use CodeIgniter\Database\BaseResult;
 use CodeIgniter\Database\Query;
 
+/**
+ * @extends BaseConnection<object|resource, object|resource>
+ */
 class MockConnection extends BaseConnection
 {
+    /**
+     * @var array{connect?: mixed, execute?: bool|object}
+     */
     protected $returnValues = [];
 
-    public $database;
+    /**
+     * Database schema for Postgre and SQLSRV
+     *
+     * @var string
+     */
+    protected $schema;
 
+    public $database;
     public $lastQuery;
 
+    /**
+     * @param mixed $return
+     *
+     * @return $this
+     */
     public function shouldReturn(string $method, $return)
     {
         $this->returnValues[$method] = $return;
@@ -53,7 +72,7 @@ class MockConnection extends BaseConnection
 
         $query->setQuery($sql, $binds, $setEscapeFlags);
 
-        if (! empty($this->swapPre) && ! empty($this->DBPrefix)) {
+        if ($this->swapPre !== '' && $this->DBPrefix !== '') {
             $query->swapPrefix($this->DBPrefix, $this->swapPre);
         }
 
@@ -73,7 +92,7 @@ class MockConnection extends BaseConnection
         $query->setDuration($startTime);
 
         // resultID is not false, so it must be successful
-        if ($query->isWriteType()) {
+        if ($query->isWriteType($sql)) {
             return true;
         }
 
@@ -113,13 +132,13 @@ class MockConnection extends BaseConnection
     /**
      * Select a specific database table to use.
      *
-     * @return mixed
+     * @return bool
      */
     public function setDatabase(string $databaseName)
     {
         $this->database = $databaseName;
 
-        return $this;
+        return true;
     }
 
     /**
@@ -133,7 +152,7 @@ class MockConnection extends BaseConnection
     /**
      * Executes the query against the database.
      *
-     * @return mixed
+     * @return bool|object
      */
     protected function execute(string $sql)
     {
@@ -168,13 +187,15 @@ class MockConnection extends BaseConnection
      */
     public function insertID(): int
     {
-        return $this->connID->insert_id; // @phpstan-ignore-line
+        return $this->connID->insert_id;
     }
 
     /**
      * Generates the SQL for listing tables in a platform-dependent manner.
+     *
+     * @param string|null $tableName If $tableName is provided will return only this table if exists.
      */
-    protected function _listTables(bool $constrainByPrefix = false): string
+    protected function _listTables(bool $constrainByPrefix = false, ?string $tableName = null): string
     {
         return '';
     }
@@ -204,6 +225,8 @@ class MockConnection extends BaseConnection
 
     /**
      * Close the connection.
+     *
+     * @return void
      */
     protected function _close()
     {

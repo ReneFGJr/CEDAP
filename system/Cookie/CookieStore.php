@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of CodeIgniter 4 framework.
  *
@@ -21,6 +23,7 @@ use Traversable;
  * The CookieStore object represents an immutable collection of `Cookie` value objects.
  *
  * @implements IteratorAggregate<string, Cookie>
+ * @see \CodeIgniter\Cookie\CookieStoreTest
  */
 class CookieStore implements Countable, IteratorAggregate
 {
@@ -34,22 +37,22 @@ class CookieStore implements Countable, IteratorAggregate
     /**
      * Creates a CookieStore from an array of `Set-Cookie` headers.
      *
-     * @param string[] $headers
-     *
-     * @throws CookieException
+     * @param list<string> $headers
      *
      * @return static
+     *
+     * @throws CookieException
      */
     public static function fromCookieHeaders(array $headers, bool $raw = false)
     {
         /**
-         * @var Cookie[] $cookies
+         * @var list<Cookie> $cookies
          */
         $cookies = array_filter(array_map(static function (string $header) use ($raw) {
             try {
                 return Cookie::fromHeaderString($header, $raw);
             } catch (CookieException $e) {
-                log_message('error', $e->getMessage());
+                log_message('error', (string) $e);
 
                 return false;
             }
@@ -59,7 +62,7 @@ class CookieStore implements Countable, IteratorAggregate
     }
 
     /**
-     * @param Cookie[] $cookies
+     * @param array<array-key, Cookie> $cookies
      *
      * @throws CookieException
      */
@@ -158,6 +161,8 @@ class CookieStore implements Countable, IteratorAggregate
 
     /**
      * Dispatches all cookies in store.
+     *
+     * @deprecated Response should dispatch cookies.
      */
     public function dispatch(): void
     {
@@ -220,7 +225,7 @@ class CookieStore implements Countable, IteratorAggregate
     protected function validateCookies(array $cookies): void
     {
         foreach ($cookies as $index => $cookie) {
-            $type = is_object($cookie) ? get_class($cookie) : gettype($cookie);
+            $type = get_debug_type($cookie);
 
             if (! $cookie instanceof Cookie) {
                 throw CookieException::forInvalidCookieInstance([static::class, Cookie::class, $type, $index]);
@@ -232,6 +237,8 @@ class CookieStore implements Countable, IteratorAggregate
      * Extracted call to `setrawcookie()` in order to run unit tests on it.
      *
      * @codeCoverageIgnore
+     *
+     * @deprecated
      */
     protected function setRawCookie(string $name, string $value, array $options): void
     {
@@ -242,6 +249,8 @@ class CookieStore implements Countable, IteratorAggregate
      * Extracted call to `setcookie()` in order to run unit tests on it.
      *
      * @codeCoverageIgnore
+     *
+     * @deprecated
      */
     protected function setCookie(string $name, string $value, array $options): void
     {

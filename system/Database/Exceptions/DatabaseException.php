@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of CodeIgniter 4 framework.
  *
@@ -11,14 +13,13 @@
 
 namespace CodeIgniter\Database\Exceptions;
 
+use CodeIgniter\Exceptions\HasExitCodeInterface;
 use Error;
 
-class DatabaseException extends Error implements ExceptionInterface
+class DatabaseException extends Error implements ExceptionInterface, HasExitCodeInterface
 {
-    /**
-     * Exit status code
-     *
-     * @var int
-     */
-    protected $code = 8;
+    public function getExitCode(): int
+    {
+        return EXIT_DATABASE;
+    }
 }

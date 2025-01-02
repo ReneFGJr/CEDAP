@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of CodeIgniter 4 framework.
  *
@@ -14,6 +16,9 @@ namespace CodeIgniter\Commands\Generators;
 use CodeIgniter\CLI\BaseCommand;
 use CodeIgniter\CLI\CLI;
 use CodeIgniter\CLI\GeneratorTrait;
+use Config\Database;
+use Config\Migrations;
+use Config\Session as SessionConfig;
 
 /**
  * Generates a skeleton migration file.
@@ -53,7 +58,7 @@ class MigrationGenerator extends BaseCommand
     /**
      * The Command's Arguments
      *
-     * @var array
+     * @var array<string, string>
      */
     protected $arguments = [
         'name' => 'The migration class name.',
@@ -62,7 +67,7 @@ class MigrationGenerator extends BaseCommand
     /**
      * The Command's Options
      *
-     * @var array
+     * @var array<string, string>
      */
     protected $options = [
         '--session'   => 'Generates the migration file for database sessions.',
@@ -87,7 +92,7 @@ class MigrationGenerator extends BaseCommand
         }
 
         $this->classNameLang = 'CLI.generator.className.migration';
-        $this->execute($params);
+        $this->generateClass($params);
     }
 
     /**
@@ -95,16 +100,22 @@ class MigrationGenerator extends BaseCommand
      */
     protected function prepare(string $class): string
     {
+        $data            = [];
         $data['session'] = false;
 
         if ($this->getOption('session')) {
             $table   = $this->getOption('table');
             $DBGroup = $this->getOption('dbgroup');
 
-            $data['session'] = true;
-            $data['table']   = is_string($table) ? $table : 'ci_sessions';
-            $data['DBGroup'] = is_string($DBGroup) ? $DBGroup : 'default';
-            $data['matchIP'] = config('App')->sessionMatchIP;
+            $data['session']  = true;
+            $data['table']    = is_string($table) ? $table : 'ci_sessions';
+            $data['DBGroup']  = is_string($DBGroup) ? $DBGroup : 'default';
+            $data['DBDriver'] = config(Database::class)->{$data['DBGroup']}['DBDriver'];
+
+            /** @var SessionConfig|null $session */
+            $session = config(SessionConfig::class);
+
+            $data['matchIP'] = $session->matchIP;
         }
 
         return $this->parseTemplate($class, [], [], $data);
@@ -115,6 +126,6 @@ class MigrationGenerator extends BaseCommand
      */
     protected function basename(string $filename): string
     {
-        return gmdate(config('Migrations')->timestampFormat) . basename($filename);
+        return gmdate(config(Migrations::class)->timestampFormat) . basename($filename);
     }
 }

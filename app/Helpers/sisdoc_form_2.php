@@ -19,13 +19,13 @@
                     if (isset($_SESSION['srch_']))
                         {
                             $search = $_SESSION['srch_'];
-                            $search_field = $_SESSION['srch_tp'];        
+                            $search_field = $_SESSION['srch_tp'];
                         }
                     if (strlen($search) > 0)
                         {
                             $th->like($fl[$search_field],$search);
                         }
-                }            
+                }
             $th->orderBy($fl[$search_field]);
 
             $v = $th->paginate(15);
@@ -33,7 +33,7 @@
 
             /**************************************************************** TABLE NAME */
             $sx = bsc('<h1>'.$th->table.'</h1>',12);
-    
+
             $st = '<table width="100%" border=1>';
             $st .= '<tr><td>';
             $st .= form_open();
@@ -56,7 +56,7 @@
             $st .= '</td><td align="right">';
             $st .= $th->pager->GetTotal();
             $st .= '/'.$th->countAllResults();
-            $st .= '/'.$th->pager->getPageCount();    
+            $st .= '/'.$th->pager->getPageCount();
             $st .= '</td>';
 
             /*********** NEW */
@@ -68,7 +68,7 @@
             $sx .= bs($st,12);
 
             $sx .= '<table class="table" border="1">';
-    
+
             /* Header */
             $heads = $th->allowedFields;
             $sx .= '<tr>';
@@ -76,9 +76,9 @@
             for($h=1;$h < count($heads);$h++)
                 {
                     $sx .= '<th>'.lang($heads[$h]).'</th>';
-                }            
+                }
             $sx .= '</tr>'.cr();
-    
+
             /* Data */
             for ($r=0;$r < count($v);$r++)
                 {
@@ -89,7 +89,7 @@
                             $vlr = $line[$field];
                             if (strlen($vlr) == 0) { $vlr = ' '; }
                             $sx .= '<td>'.anchor(($url.'/viewid/'.$line[$fl[0]]),$vlr).'</td>';
-                        }   
+                        }
                     /* Botoes */
                     $sx .= '<td>';
                     $sx .= linked($url.'/edit/'.$line[$fl[0]],'[ed]').'&nbsp;';
@@ -103,6 +103,17 @@
             $sx .= bsdivclose();
             $sx .= bsdivclose();
             $sx .= bsdivclose();
-            return($sx);    
-        }  
+            return($sx);
+        }
+
+        function linked($url,$icon)
+            {
+                $sx = '<a href="'.$url.'">'.$icon.'</a>';
+                return $sx;
+            }
+        function linkdel($url, $icon)
+        {
+            $sx = '<a href="' . $url . '">' . $icon . '</a>';
+            return $sx;
+        }
 ?>

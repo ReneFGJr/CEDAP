@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of CodeIgniter 4 framework.
  *
@@ -10,6 +12,8 @@
  */
 
 namespace CodeIgniter\Test\Mock;
+
+use Tests\Support\Log\Handlers\TestHandler;
 
 class MockLogger
 {
@@ -63,7 +67,7 @@ class MockLogger
       | The logging system supports multiple actions to be taken when something
       | is logged. This is done by allowing for multiple Handlers, special classes
       | designed to write the log to their chosen destinations, whether that is
-      | a file on the getServer, a cloud-based service, or even taking actions such
+      | a file on the server, a cloud-based service, or even taking actions such
       | as emailing the dev team.
       |
       | Each handler is defined by the class name used for that handler, and it
@@ -81,7 +85,7 @@ class MockLogger
      */
     public $handlers = [
         // File Handler
-        'Tests\Support\Log\Handlers\TestHandler' => [
+        TestHandler::class => [
             // The log levels that this handler will handle.
             'handles' => [
                 'critical',

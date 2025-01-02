@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of CodeIgniter 4 framework.
  *
@@ -12,7 +14,6 @@
 namespace CodeIgniter\Log\Handlers;
 
 use CodeIgniter\HTTP\ResponseInterface;
-use Config\Services;
 
 /**
  * Class ChromeLoggerHandler
@@ -21,6 +22,7 @@ use Config\Services;
  * Requires the ChromeLogger extension installed in your browser.
  *
  * @see https://craig.is/writing/chrome-logger
+ * @see \CodeIgniter\Log\Handlers\ChromeLoggerHandlerTest
  */
 class ChromeLoggerHandler extends BaseHandler
 {
@@ -128,7 +130,7 @@ class ChromeLoggerHandler extends BaseHandler
     /**
      * Converts the object to display nicely in the Chrome Logger UI.
      *
-     * @param mixed $object
+     * @param array|int|object|string $object
      *
      * @return array
      */
@@ -141,7 +143,7 @@ class ChromeLoggerHandler extends BaseHandler
         // @todo Modify formatting of objects once we can view them in browser.
         $objectArray = (array) $object;
 
-        $objectArray['___class_name'] = get_class($object);
+        $objectArray['___class_name'] = $object::class;
 
         return $objectArray;
     }
@@ -149,15 +151,17 @@ class ChromeLoggerHandler extends BaseHandler
     /**
      * Attaches the header and the content to the passed in request object.
      *
-     * @param ResponseInterface $response
+     * @return void
      */
     public function sendLogs(?ResponseInterface &$response = null)
     {
-        if ($response === null) {
-            $response = Services::response(null, true);
+        if (! $response instanceof ResponseInterface) {
+            $response = service('response', null, true);
         }
 
-        $data = base64_encode(utf8_encode(json_encode($this->json)));
+        $data = base64_encode(
+            mb_convert_encoding(json_encode($this->json), 'UTF-8', mb_list_encodings())
+        );
 
         $response->setHeader($this->header, $data);
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of CodeIgniter 4 framework.
  *
@@ -9,8 +11,10 @@
  * the LICENSE file that was distributed with this source code.
  */
 
+use CodeIgniter\Exceptions\TestException;
 use CodeIgniter\Model;
 use CodeIgniter\Test\Fabricator;
+use Config\Services;
 
 // CodeIgniter Test Helpers
 
@@ -20,17 +24,15 @@ if (! function_exists('fake')) {
      *
      * @param Model|object|string $model     Instance or name of the model
      * @param array|null          $overrides Overriding data to pass to Fabricator::setOverrides()
-     * @param mixed               $persist
+     * @param bool                $persist
      *
      * @return array|object
      */
     function fake($model, ?array $overrides = null, $persist = true)
     {
-        // Get a model-appropriate Fabricator instance
         $fabricator = new Fabricator($model);
 
-        // Set overriding data, if necessary
-        if ($overrides) {
+        if ($overrides !== null) {
             $fabricator->setOverrides($overrides);
         }
 
@@ -39,5 +41,32 @@ if (! function_exists('fake')) {
         }
 
         return $fabricator->make();
+    }
+}
+
+if (! function_exists('mock')) {
+    /**
+     * Used within our test suite to mock certain system tools.
+     *
+     * @param string $className Fully qualified class name
+     *
+     * @return object
+     */
+    function mock(string $className)
+    {
+        $mockClass   = $className::$mockClass;
+        $mockService = $className::$mockServiceName ?? '';
+
+        if (empty($mockClass) || ! class_exists($mockClass)) {
+            throw TestException::forInvalidMockClass($mockClass);
+        }
+
+        $mock = new $mockClass();
+
+        if (! empty($mockService)) {
+            Services::injectMock($mockService, $mock);
+        }
+
+        return $mock;
     }
 }

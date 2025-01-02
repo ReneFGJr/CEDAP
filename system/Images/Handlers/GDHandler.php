@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of CodeIgniter 4 framework.
  *
@@ -188,7 +190,7 @@ class GDHandler extends BaseHandler
             imagesavealpha($dest, true);
         }
 
-        $copy($dest, $src, 0, 0, $this->xAxis, $this->yAxis, $this->width, $this->height, $origWidth, $origHeight);
+        $copy($dest, $src, 0, 0, (int) $this->xAxis, (int) $this->yAxis, $this->width, $this->height, $origWidth, $origHeight);
 
         imagedestroy($src);
         $this->resource = $dest;
@@ -204,11 +206,13 @@ class GDHandler extends BaseHandler
      * Example:
      *    $image->resize(100, 200, true)
      *          ->save();
+     *
+     * @param non-empty-string|null $target
      */
     public function save(?string $target = null, int $quality = 90): bool
     {
         $original = $target;
-        $target   = empty($target) ? $this->image()->getPathname() : $target;
+        $target   = ($target === null || $target === '') ? $this->image()->getPathname() : $target;
 
         // If no new resource has been created, then we're
         // simply copy the existing one.
@@ -224,6 +228,13 @@ class GDHandler extends BaseHandler
         }
 
         $this->ensureResource();
+
+        // for png and webp we can actually preserve transparency
+        if (in_array($this->image()->imageType, $this->supportTransparency, true)) {
+            imagepalettetotruecolor($this->resource);
+            imagealphablending($this->resource, false);
+            imagesavealpha($this->resource, true);
+        }
 
         switch ($this->image()->imageType) {
             case IMAGETYPE_GIF:
@@ -261,7 +272,7 @@ class GDHandler extends BaseHandler
                     throw ImageException::forInvalidImageCreate(lang('Images.webpNotSupported'));
                 }
 
-                if (! @imagewebp($this->resource, $target)) {
+                if (! @imagewebp($this->resource, $target, $quality)) {
                     throw ImageException::forSaveFailed();
                 }
                 break;
@@ -322,9 +333,9 @@ class GDHandler extends BaseHandler
      * @param string $path      Image path
      * @param int    $imageType Image type
      *
-     * @throws ImageException
-     *
      * @return bool|resource
+     *
+     * @throws ImageException
      */
     protected function getImageResource(string $path, int $imageType)
     {
@@ -348,7 +359,7 @@ class GDHandler extends BaseHandler
                     throw ImageException::forInvalidImageCreate(lang('Images.pngNotSupported'));
                 }
 
-                return imagecreatefrompng($path);
+                return @imagecreatefrompng($path);
 
             case IMAGETYPE_WEBP:
                 if (! function_exists('imagecreatefromwebp')) {
@@ -375,11 +386,11 @@ class GDHandler extends BaseHandler
         // offset flips itself automatically
 
         if ($options['vAlign'] === 'bottom') {
-            $options['vOffset'] = $options['vOffset'] * -1;
+            $options['vOffset'] *= -1;
         }
 
         if ($options['hAlign'] === 'right') {
-            $options['hOffset'] = $options['hOffset'] * -1;
+            $options['hOffset'] *= -1;
         }
 
         // Set font width and height
@@ -451,7 +462,7 @@ class GDHandler extends BaseHandler
          * Get the rest of the string and split it into 2-length
          * hex values:
          */
-        $opacity = ($options['opacity'] * 127);
+        $opacity = (int) ($options['opacity'] * 127);
 
         // Allow opacity to be applied to the text
         imagealphablending($src, true);
@@ -460,7 +471,7 @@ class GDHandler extends BaseHandler
 
         // shorthand hex, #f00
         if (strlen($color) === 3) {
-            $color = implode('', array_map('str_repeat', str_split($color), [2, 2, 2]));
+            $color = implode('', array_map(str_repeat(...), str_split($color), [2, 2, 2]));
         }
 
         $color = str_split(substr($color, 0, 6), 2);
@@ -472,9 +483,9 @@ class GDHandler extends BaseHandler
         // Add the shadow to the source image
         if (! empty($options['fontPath'])) {
             // We have to add fontheight because imagettftext locates the bottom left corner, not top-left corner.
-            imagettftext($src, $options['fontSize'], 0, $xAxis, $yAxis + $options['fontheight'], $color, $options['fontPath'], $text);
+            imagettftext($src, $options['fontSize'], 0, (int) $xAxis, (int) ($yAxis + $options['fontheight']), $color, $options['fontPath'], $text);
         } else {
-            imagestring($src, $options['fontSize'], $xAxis, $yAxis, $text, $color);
+            imagestring($src, (int) $options['fontSize'], (int) $xAxis, (int) $yAxis, $text, $color);
         }
 
         $this->resource = $src;

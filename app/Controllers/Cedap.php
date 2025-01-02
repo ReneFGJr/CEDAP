@@ -8,6 +8,8 @@ use App\Controllers\BaseController;
 $this->session = \Config\Services::session();
 $language = \Config\Services::language();
 
+define("MODULE","cedap");
+
 helper(['boostrap','url','graphs','sisdoc_forms','form']);
 
 function cr()
@@ -28,12 +30,12 @@ class Cedap extends BaseController
 		define("PATH", "index.php/cedap/");
 		define("LIBRARY", "CEDAP_LABS");
 		define("LIBRARY_NAME", "");
-	}	
+	}
 
 	private function cab($dt=array())
 		{
 			$title = 'Brapci3 - DrashDataBoard';
-			if (isset($dt['title'])) { $title = $dt['title']; } 
+			if (isset($dt['title'])) { $title = $dt['title']; }
 			$sx = '<!doctype html>'.cr();
 			$sx .= '<html>'.cr();
 			$sx .= '<head>'.cr();
@@ -53,10 +55,10 @@ class Cedap extends BaseController
 
 		}
 
-	private function navbar($dt=array())	
+	private function navbar($dt=array())
 		{
 			$title = 'CEDAP Labs';
-			if (isset($dt['title'])) { $title = $dt['title']; } 
+			if (isset($dt['title'])) { $title = $dt['title']; }
 			$sx = '<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: '.$this->bg.'">'.cr();
 			$sx .= '  <div class="container-fluid">'.cr();
 			$sx .= '    <a class="navbar-brand" href="'.base_url().'">'.$title.'</a>'.cr();
@@ -95,6 +97,20 @@ class Cedap extends BaseController
 			$sx .= '            <li><a class="dropdown-item" href="#">Something else here</a></li>'.cr();
 			$sx .= '          </ul>'.cr();
 			$sx .= '        </li>'.cr();
+
+			$sx .= '        <li class="nav-item dropdown">' . cr();
+			$sx .= '          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">' . cr();
+			$sx .= '            ' . lang('brapci.DCI') . cr();
+			$sx .= '          </a>' . cr();
+			$sx .= '          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">' . cr();
+			$sx .= '            <li><a class="dropdown-item" href="'.base_url('/dci/cursos').'">' . lang('brapci.Encargos.Cursos') . '</a></li>' . cr();
+			$sx .= '            <li><a class="dropdown-item" href="#">' . lang('brapci.Encargos.Drashboard') . '</a></li>' . cr();
+			$sx .= '            <li><hr class="dropdown-divider"></li>' . cr();
+			$sx .= '            <li><a class="dropdown-item" href="#">' . lang('brapci.Encargos.Drashboard') . '</a></li>' . cr();
+			$sx .= '          </ul>' . cr();
+			$sx .= '        </li>' . cr();
+
+
 			$sx .= '      </ul>'.cr();
 
 			/*
@@ -118,6 +134,7 @@ class Cedap extends BaseController
 			$sx .= '</nav>'.cr();
 			return $sx;
 		}
+
 
 	private function footer()
 		{
@@ -259,7 +276,7 @@ class Cedap extends BaseController
 					</footer>
 					<!-- Footer -->';
 			return $sx;
-		}        
+		}
 
 	public function social($d1 = '', $id = '')
 	{
@@ -267,9 +284,9 @@ class Cedap extends BaseController
 		$dt = array();
 		$sx = $this->Socials->index($d1,$id,$dt,$cab);
 		return $sx;
-	}	
+	}
 
-	public function index()
+	public function index($d1='',$d2='')
 	{
 		//
 		$tela = $this->cab();
@@ -278,7 +295,7 @@ class Cedap extends BaseController
 		$d[0] = array('image'=>base_url('img/banner/banner_cedap_01.jpg'),'link'=>'');
 		$d[1] = array('image'=>'https://images3.alphacoders.com/102/102609.jpg','link'=>'');
 		$d[2] = array('image'=>'https://static.escolakids.uol.com.br/2019/07/paisagem-natural-e-paisagem-cultural.jpg','link'=>'');
-		
+
 		$tela .= bscarousel($d);
 
 		#### Logado
@@ -294,7 +311,7 @@ class Cedap extends BaseController
 						bsc(bscard('Hello'),4).
 						bsc($login,4)
 					);
-            }		
+            }
 		$tela .= $this->footer($d);
 		return $tela;
 	}
@@ -311,7 +328,7 @@ class Cedap extends BaseController
 		#### Rodape - Footer
         $tela .= $this->footer();
         return $tela;
-	}    
+	}
 
     public function image($id,$id2='',$id3='')
         {

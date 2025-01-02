@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of CodeIgniter 4 framework.
  *
@@ -11,15 +13,19 @@
 
 namespace CodeIgniter\RESTful;
 
+use CodeIgniter\HTTP\ResponseInterface;
+
 /**
  * An extendable controller to help provide a UI for a resource.
+ *
+ * @see \CodeIgniter\RESTful\ResourcePresenterTest
  */
 class ResourcePresenter extends BaseResource
 {
     /**
      * Present a view of resource objects
      *
-     * @return mixed
+     * @return ResponseInterface|string|void
      */
     public function index()
     {
@@ -29,9 +35,9 @@ class ResourcePresenter extends BaseResource
     /**
      * Present a view to present a specific resource object
      *
-     * @param mixed $id
+     * @param int|string|null $id
      *
-     * @return mixed
+     * @return ResponseInterface|string|void
      */
     public function show($id = null)
     {
@@ -41,7 +47,7 @@ class ResourcePresenter extends BaseResource
     /**
      * Present a view to present a new single resource object
      *
-     * @return mixed
+     * @return ResponseInterface|string|void
      */
     public function new()
     {
@@ -52,7 +58,7 @@ class ResourcePresenter extends BaseResource
      * Process the creation/insertion of a new resource object.
      * This should be a POST.
      *
-     * @return mixed
+     * @return ResponseInterface|string|void
      */
     public function create()
     {
@@ -62,9 +68,9 @@ class ResourcePresenter extends BaseResource
     /**
      * Present a view to edit the properties of a specific resource object
      *
-     * @param mixed $id
+     * @param int|string|null $id
      *
-     * @return mixed
+     * @return ResponseInterface|string|void
      */
     public function edit($id = null)
     {
@@ -75,9 +81,9 @@ class ResourcePresenter extends BaseResource
      * Process the updating, full or partial, of a specific resource object.
      * This should be a POST.
      *
-     * @param mixed $id
+     * @param int|string|null $id
      *
-     * @return mixed
+     * @return ResponseInterface|string|void
      */
     public function update($id = null)
     {
@@ -87,9 +93,9 @@ class ResourcePresenter extends BaseResource
     /**
      * Present a view to confirm the deletion of a specific resource object
      *
-     * @param mixed $id
+     * @param int|string|null $id
      *
-     * @return mixed
+     * @return ResponseInterface|string|void
      */
     public function remove($id = null)
     {
@@ -99,9 +105,9 @@ class ResourcePresenter extends BaseResource
     /**
      * Process the deletion of a specific resource object
      *
-     * @param mixed $id
+     * @param int|string|null $id
      *
-     * @return mixed
+     * @return ResponseInterface|string|void
      */
     public function delete($id = null)
     {
