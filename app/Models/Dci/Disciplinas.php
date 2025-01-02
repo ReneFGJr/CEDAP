@@ -100,13 +100,16 @@ class Disciplinas extends Model
                         $et = $etapa;
                     }
 
+                    $act = '<i class="bi bi-person-plus"></i>';
+
                     $sx .= '<tr>';
                     $sx .= '<td width="10%" class="text-center">'.$line['di_codigo'].'</td>';
-                    $sx .= '<td width="65%">' . $line['di_disciplina'] . '</td>';
+                    $sx .= '<td width="60%">' . $line['di_disciplina'] . '</td>';
                     $sx .= '<td width="10%" class="text-center">' . $line['di_tipo'] . '</td>';
                     $sx .= '<td width="5%" class="text-center">' . $line['di_crd'] . '</td>';
                     $sx .= '<td width="5%" class="text-center">' . $line['di_ch'] . '</td>';
                     $sx .= '<td width="5%" class="text-center">' . $line['di_ext'] . '</td>';
+                    $sx .= '<td width="5%" class="text-center">' . $act . '</td>';
                     $sx .= '</tr>';
             }
         $sx .= '</table>';

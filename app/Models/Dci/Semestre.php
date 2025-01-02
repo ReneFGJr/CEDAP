@@ -49,8 +49,9 @@ class Semestre extends Model
         $sx = '';
 
         $mn = [];
-        $mn['Departamento'] = PATH . '/dci/';
-        $mn['Semestre'] = PATH . '/dci/semestre/';
+        $mn['Departamento'] = base_url('/dci/');
+        $mn['Semestre'] = base_url('/dci/semestre/');
+        $return_btn = '<br><a href="' . $mn['Departamento'] . '" class="btn btn-outline-secondary mt-2">voltar</a>';
         $sx .= breadcrumbs($mn);
 
         switch ($d1) {
@@ -59,15 +60,17 @@ class Semestre extends Model
                 break;
             case 'mark':
                 $sx .= $this->mark($d2, $d3, $d4, $d5);
+                $sx .= $return_btn;
                 break;
             case 'view':
                 $sx .= $this->viewid($d2, $d3, $d4);
                 break;
             default:
-                $sx .= bs($this->list($d2));
+                $sx .= $this->list($d2);
+                $sx .= $return_btn;
                 break;
         }
-        return $sx;
+        return bs(bsc($sx));
     }
 
     public function getSemestre($tp='')

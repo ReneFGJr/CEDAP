@@ -54,6 +54,11 @@ class Index extends Model
             $this->semestreID = $Semestre->getSemestre('ID');
             $this->semestre = $Semestre->getSemestre('');
 
+            if ($this->semestre == '')
+                {
+                    $d1 = 'semestre';
+                }
+
             $sem = 1;
             $sx = '';
             switch($d1)

@@ -206,12 +206,14 @@ class Cursos extends Model
     {
         $dt = $this->find($id);
         $sx = '';
+        $sx .= view('DCI/curso_header', $dt);
+        if ($dt['c_url_ufrgs'] != '') {
+            $sx .= bs(bsc('<a href="' . base_url('dci/cursos/import/' . $id) . '">Importar dados do curso</a>'));
+        }
         $Disciplinas = new \App\Models\Dci\Disciplinas();
         $sx .= $Disciplinas->mostraDisciplina($id);
 
-        if ($dt['c_url_ufrgs'] != '') {
-            $sx .= '<a href="' . base_url('dci/cursos/import/' . $id) . '">Importar dados do curso</a>';
-        }
+
         return $sx;
     }
 }

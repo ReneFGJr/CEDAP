@@ -849,4 +849,5 @@
 
     <!-- CSS -->
     <script src="http://cedap/js/bootstrap.js?v=5.0.2"></script>
+    <link href="<?= base_url('assets/bootstrap-icons/font/bootstrap-icons.css'); ?>" rel="stylesheet">
 </head>
