@@ -28,7 +28,7 @@ class Encargos extends Model
         'qr:id_sem:sem_descricao:(select id_sem,sem_descricao from dci.semestre where sem_ativo = 1) as semestre ',
         'qr:id_di:di_disciplina:(select id_di, concat(\' Etapa \', di_etapa,\' - \', di_codigo ,\' - \',di_disciplina) as di_disciplina from dci.disciplinas order by di_codigo) as disciplinas',
         'qr:id_dc:dc_nome:dci.docentes',
-        'hidden',
+        'qr:cr_valor:cr_nome:dci.creditos',
         'qr:id_c:c_curso:dci.curso',
         'qr:hd_dia:hd_dia_name:dci.horario_dia',
         'qr:hora_inicio:hora_inicio:dci.horario_hora',

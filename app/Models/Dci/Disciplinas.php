@@ -84,12 +84,19 @@ class Disciplinas extends Model
 
     function mostraDisciplina($id)
     {
-        $dt = $this->where('di_curso', $id)
+        $Semestre = new \App\Models\Dci\Semestre();
+        $sem = $Semestre->getSemestre('ID');
+
+        $dt = $this
+            ->join('encargos', 'id_di = e_disciplina and e_semestre = '.$sem, 'left')
+            ->join('docentes', 'e_docente = id_dc', 'left')
+            ->where('di_curso', $id)
             ->orderBy('di_etapa, di_codigo')
         ->findAll();
 
         $et = '';
         $sx = '<table class="table full">';
+        $xdisciplina = '';
         foreach($dt as $id=>$line)
             {
                 $etapa = $line['di_etapa'];
@@ -102,15 +109,34 @@ class Disciplinas extends Model
 
                     $act = '<i class="bi bi-person-plus"></i>';
 
+                if ($xdisciplina != $line['di_disciplina'])
+                    {
                     $sx .= '<tr>';
                     $sx .= '<td width="10%" class="text-center">'.$line['di_codigo'].'</td>';
-                    $sx .= '<td width="60%">' . $line['di_disciplina'] . '</td>';
+                    $sx .= '<td width="60%">' . $line['di_disciplina'];
+                    /* Docentes */
+                    if ($line['e_semestre'] == $sem)
+                        {
+                            $link = '<a href="'.base_url(PATH. 'dci/encargos/'.$line['id_di']).'">';
+                            $linka = '</a>';
+                            $sx .= '<br><span class="fst-italic ms-3">'.$link.nbr_author($line['dc_nome'],7).$linka.'</span>';
+                        if ($line['e_credito'] == 0)
+                            {
+                                $sx .= ' (<span style="color: red">'.$line['e_credito']. ' crd</span>)';
+                            } else {
+                                $sx .= ' (' . $line['e_credito'] . ' crd)';
+                            }
+
+                        }
+                    $sx .= '</td>';
                     $sx .= '<td width="10%" class="text-center">' . $line['di_tipo'] . '</td>';
                     $sx .= '<td width="5%" class="text-center">' . $line['di_crd'] . '</td>';
                     $sx .= '<td width="5%" class="text-center">' . $line['di_ch'] . '</td>';
                     $sx .= '<td width="5%" class="text-center">' . $line['di_ext'] . '</td>';
                     $sx .= '<td width="5%" class="text-center">' . $act . '</td>';
                     $sx .= '</tr>';
+                    $xdisciplina = $line['di_disciplina'];
+                    }
             }
         $sx .= '</table>';
         return bs(bsc($sx,12));

@@ -210,10 +210,9 @@ class Cursos extends Model
         if ($dt['c_url_ufrgs'] != '') {
             $sx .= bs(bsc('<a href="' . base_url('dci/cursos/import/' . $id) . '">Importar dados do curso</a>'));
         }
+
         $Disciplinas = new \App\Models\Dci\Disciplinas();
         $sx .= $Disciplinas->mostraDisciplina($id);
-
-
         return $sx;
     }
 }
