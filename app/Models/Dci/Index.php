@@ -64,9 +64,20 @@ class Index extends Model
             switch($d1)
                 {
                     case 'encargos':
-                        if (trim($d3)=='') { $d3 == 0;}
+                        if (trim($d2)=='') { $d2 == 0;}
                         $Encargos = new \App\Models\Dci\Encargos();
-                        $sx .= $Encargos->edit($d3);
+                        switch($d2)
+                            {
+                                case 'edit':
+                                    $sx .= $Encargos->edit($d3);
+                                    break;
+                                case 'new':
+                                    $sx .= $Encargos->new();
+                                    break;
+                                default:
+                                    $sx .= "MENU";
+                                    break;
+                            }
                         break;
                     case 'report':
                         switch($d2)

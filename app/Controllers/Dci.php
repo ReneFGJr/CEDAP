@@ -28,7 +28,10 @@ class Dci extends BaseController
 
         $DCI = new \App\Models\Dci\Index();
         $sx .= $DCI->index($d1,$d2,$d3,$d4,$d5);
+
         $sx .= view('DCI/Headers/footer', $data);
+        echo $sx;
+        exit;
         return $sx;
     }
 }

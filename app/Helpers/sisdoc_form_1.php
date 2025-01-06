@@ -58,7 +58,11 @@ function form($th)
         /********************************* Salvar *****************/
         $dt = $_POST;
 
-        /* Load Data from registrer *******************************/
+    /* Load Data from registrer *******************************/
+        if ((count($dt) == 0) and ($id == 0)) {
+            $dt = $_GET;
+        }
+
         if ((count($dt) == 0) and ($id > 0))
             {
                 $dt = $th->find($th->id);
@@ -252,15 +256,15 @@ function form($th)
                         $sx .= $td.($fld).$tdc;
                         $sx .= $td;
 
-                        $sg = '<select id="'.$fld.'" name="'.$fld.'" value="'.$vlr.'" class="form-control">'.cr();
+                        $sg = '<select id="'.$fld.'" name="'.$fld.'" value="'.$vlr.'" class="form-control mb-3">'.cr();
                         for ($r=0;$r < count($query);$r++)
                             {
                                 $ql = (array)$query[$r];
                                 $sel = '';
+                                if ($vlr == $ql[$fld1]) { $sel = 'selected'; }
                                 $sg .= '<option value="'.$ql[$fld1].'" '.$sel.'>'.$ql[$fld2].'</option>'.cr();
                             }
                         $sg .= '</select>'.cr();
-                        $sg .= '['.$vlr.']';
                         $sx .= $sg;
                         $sx .= $tdc;
                         break;

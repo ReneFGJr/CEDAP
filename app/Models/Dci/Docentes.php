@@ -72,8 +72,8 @@ class Docentes extends Model
             $dt = $this
                 //->select('id_e,e_docente,di_etapa,dc_nome,c_curso,e_turma,di_disciplina,di_codigo,di_tipo,di_crd,di_ch,di_ext,di_tipo,c_bg')
                 ->join('encargos', '(e_docente = id_dc) and (e_semestre = '.$sem.')')
-                ->join('curso', 'id_c = e_curso')
                 ->join('disciplinas', 'e_disciplina = id_di')
+                ->join('curso', 'id_c = di_curso')
                 ->join('horario_dia', 'e_dia = id_hd', 'LEFT')
                 ->join('horario_hora', 'e_horario = id_hora', 'LEFT')
                 ->join('semestre', 'e_semestre = id_sem', 'LEFT')
@@ -128,7 +128,7 @@ class Docentes extends Model
                                     $etapa = ' ('.$etapa.'ª Etapa)';
                                 }
 
-                            $link = '<a href="' . PATH . '/dci/encargos/edit/' . $ddados['id_e'] . '" target="_blank">';
+                            $link = '<a href="' . base_url('/dci/encargos/edit/' . $ddados['id_e']) . '" target="_blank">';
                             $linka = '</a>';
 
 
