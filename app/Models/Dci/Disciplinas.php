@@ -65,6 +65,7 @@ class Disciplinas extends Model
 
     var $path = PATH . '/dci/disciplinas/';
     var $path_back = PATH . '/dci/disciplinas/';
+    var $id;
 
     function index($d1 = '', $d2 = '', $d3 = '', $d4 = '', $d5 = '')
     {
