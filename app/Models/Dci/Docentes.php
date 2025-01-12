@@ -114,7 +114,7 @@ class Docentes extends Model
                     foreach($dados as $idd=>$ddados)
                         {
                             $nc++;
-                            $crt = $crt + $ddados['di_crd'];
+                            $crt = $crt + $ddados['e_credito'];
                             if ($nc > 1)
                                 {
                                     $sx .= '<tr>';

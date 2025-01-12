@@ -141,7 +141,7 @@ class Disciplinas extends Model
                                 $sx .= ' (' . $lined['e_credito'] . ' crd)';
                             }
 
-                            $sx .= ' - '.$lined['hd_dia_name'].' '.$lined['hora_inicio'];
+                            $sx .= ' - ' . $lined['hd_dia_name'] . ' ' . $lined['hora_inicio'];
                         }
                     }
                 }
@@ -294,82 +294,80 @@ class Disciplinas extends Model
         if ($curso != '') {
             $this->where('di_curso', $curso);
         }
-        $this->orderBy('di_etapa, hd_dia, hora_inicio, di_codigo');
+        $this->orderBy('di_curso, di_etapa, hd_dia, hora_inicio, di_codigo');
         $dt = $this->findAll();
 
-        $xetapa = '';
-        $xcurso = '';
+        $curso = [];
 
-        $sx = '';
-        $sa = '';
 
         $w = [];
         foreach ($dt as $id => $line) {
-            pre($line);
-        }
+            $xcurso = $line['c_curso'];
+            $xetapa = $line['di_etapa'];
 
-        foreach ($dt as $id => $line) {
-            $sx = '';
-            $xcurso = $line['di_curso'];
-            $nome = $line['di_disciplina'];
-            $codigo = $line['di_codigo'];
-            $etapa = $line['di_etapa'];
-            $h_hora_ini = $line['hora_inicio'];
-            $h_hora_fim = "";
-            $h_dia = $line['hd_dia_name'];
-            $docente = $line['dc_nome'];
-            $curso = $line['c_curso'];
-            $hora = $line['id_hora'];
-            if ($hora == '') {
-                $link = '<a target="_blank" href="' . PATH . '/dci/encargos/edit/' . $line['id_e'] . '" target="_blank">';
-                $linka = '</a>';
-                $sa .= '<li>' . $link . $nome . $linka . ' (' . $etapa . 'º Etapa)</li>';
-            } else {
-                $link = '<a target="_blank" href="' . PATH . '/dci/encargos/edit/' . $line['id_e'] . '" target="_blank">';
-                $linka = '</a>';
-                $w[$curso][$etapa][$h_dia][$h_hora_ini . '-' . $h_hora_fim] = '<p>' . $link . $codigo . ' -' . $nome . $linka . '<br><span class="italic">' . nbr_author($docente, 7) . '</span></p>';
+            if (!isset($curso[$xcurso])) {
+                $curso[$xcurso] = [];
             }
-            //pre($line);
+
+            if (!isset($curso[$xcurso][$xetapa])) {
+                $curso[$xcurso][$xetapa] = [];
+            }
+
+            if (!isset($curso[$xcurso][$xetapa][$line['hd_dia_name']])) {
+                $curso[$xcurso][$xetapa] = ['SEG' => [], 'TER' => [], 'QUA' => [], 'QUI' => [], 'SEX' => []];
+            }
+
+            if (!isset($curso[$xcurso][$xetapa][$line['hd_dia_name']][$line['hora_inicio']])) {
+                $curso[$xcurso][$xetapa][$line['hd_dia_name']][$line['hora_inicio']] = [];
+            }
+
+            $curso[$xcurso][$xetapa][$line['hd_dia_name']][$line['hora_inicio']][] = $line;
         }
-        $sc = '<ul>' . $sa . '</ul>' . $sx;
-        $wd = ['SEG', 'TER', 'QUA', 'QUI', 'SEX'];
-        $hr = ['08h30', '09h20', '====', '10h30', '11h20', '12h10', '13h30', '14h20', '---', '15h30', '16h20', '18h30', '19h20', '---', '20h30', '21h20'];
-        $sb = '';
         $sx = '';
-        $sa = '';
+        foreach ($curso as $ncurso => $etapa) {
+            $sx .= '<table class="table">';
+            $sx .= '<tr><th colspan=10 class="h3">' . $ncurso . '</th></tr>';
+            foreach ($etapa as $etapa => $dia) {
+                $sx .= '<tr><th colspan=10 class="h4 text-center">Etapa ' . $etapa . '</th></tr>';
+                $sh = '<tr>';
+                $sc = '<tr>';
+                foreach ($dia as $dia => $hora) {
+                    $sh .= '<th width="20%">' . $dia . '</th>';
+                    $sc .= '<td style="font-size: 0.7em;">';
 
-
-        foreach ($w as $curso => $d1) {
-            $sb .= '<tr><td colspan=10>' . h($curso, 2) . '</td></tr>';
-            foreach ($d1 as $etapa => $d2) {
-                $etapa_label = $etapa . 'º etapa';
-                if ($etapa == 9) {
-                    $etapa_label = 'Eletiva';
-                }
-                $sb .= '<tr><td colspan=10>' . h($etapa_label, 4) . '</td></tr>';
-                $sb .= '<tr>';
-
-                foreach ($wd as $id => $day) {
-
-                    $sb .= '<td width="16%" valign="top" class="border border-secondary p-2">';
-                    $sb .= $day;
-
-                    if (isset($d2[$day])) {
-                        $d3 = $d2[$day];
-                        foreach ($d3 as $hora => $curso) {
-                            $sb .= '<br><span style="font-size: 0.75em;">' . $hora  . $curso . '</span>';
+                    foreach ($hora as $hora => $disc) {
+                        $sc .= h($hora, 6);
+                        $xcod = '';
+                        foreach ($disc as $idd => $line) {
+                            $cod = $line['di_codigo'];
+                            $link = '<a href="' . base_url('/dci/encargos/edit/' . $line['id_e']) . '" target="_blank">';
+                            $linka = '</a>';
+                            if ($xcod != $cod)
+                            {
+                                $xcod = $cod;
+                                $sc .= $line['di_codigo'];
+                                $sc .= ' - ';
+                                $sc .= $line['di_disciplina'];
+                                $sc .= '<br><span class="small">' . $line['di_tipo'] . '</span>';
+                                $sc .= '<br>'.$line['e_credito'].'/'.$line['di_crd'].' crd';
+                                $sc .= '<li class="small"><i>'. $link.$line['dc_nome']. $linka.'</i></li>';
+                                #$sc .= '<td><a href="'.base_url(PATH.'dci/encargos/edit/0?e_semestre='.$sem.'&e_turma=U&e_disciplina='.$line['id_di']).'"><i class="bi bi-person-plus"></i></a></td>';
+                            } else {
+                                $sc .= '<li class="small"><i>' . $link . $line['dc_nome'] . $linka . '</i></li>';
+                            }
+                            #$sc .= '<td><a href="'.base_url(PATH.'dci/encargos/edit/0?e_semestre='.$sem.'&e_turma=U&e_disciplina='.$line['id_di']).'"><i class="bi bi-person-plus"></i></a></td>';
                         }
                     }
+                    $sx .= '</td>';
                 }
-                $sb .= '</tr>';
+                $sc .= '</tr>';
+                $sh .= '</tr>';
+                $sx .= $sh;
+                $sx .= $sc;
             }
+            $sx .= '</table>';
         }
-
-        $sa = '<table border=1 style="border: 1px solid #000;">';
-        $sa .= '<tr>' . $sb . '</tr>';
-        $sa .= '</table>';
-        $sx .= bs(bsc($sf, 12, 'nopr d-print-none') . bsc($sa, 12) . bsc($sc, 12));
-        return $sx;
+        return bs(bsc($sx,12));
     }
 
     function show_semestre_disciplinas($id = 0, $curso = 0)
